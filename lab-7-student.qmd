@@ -8,7 +8,6 @@ code-fold: true
 code-tools: true
 warning: false
 message: false
-
 ---
 
 The goal of this lab is learn more about exploring missing data and writing

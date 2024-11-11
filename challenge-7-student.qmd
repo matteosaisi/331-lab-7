@@ -1,15 +1,23 @@
 ---
 title: "Challenge 7: Incorporating Multiple Inputs"
 subtitle: "Functions + Fish"
-author: "Your name here!"
+author: "Matteo Saisi"
 format: html
 editor: source
 embed-resources: true
+code-fold: true
+code-tools: true
+message: false
+warning: false
 ---
 
 ```{r}
 #| label: setup
 
+library(tidyverse)
+library(here)
+
+BlackfootFish <- read.csv(here::here("data", "BlackfootFish.csv"))
 
 ```
 
@@ -25,6 +33,9 @@ $$\text{condition index} = \frac{weight}{length^3} \times 100$$
 
 ```{r}
 #| label: transform-data-to-have-correct-units
+
+BlackfootFish <- BlackfootFish |>
+  mutate(length = length / 10)
 
 ```
 
@@ -43,12 +54,24 @@ If you are struggling with the structure of your function, I would suggest readi
 ```{r}
 #| label: function-to-change-impossible-measurements-to-NA
 
+unreasonable_values <- function(values, min_measurement, max_measurement){
+  case_when(
+    values < min_measurement ~ NA,
+    values > max_measurement ~ NA,
+    .default = values
+  )
+}
+
 ```
 
 **3. After consulting the [Montana Record Table](https://fwp.mt.gov/fish/anglingData/records) for the four species of trout included in these data, I have conjectured that it is unlikely to have measurements for fish below 5 cm and above 80 cm in length or below 10 g and above 4,000 g in weight. Use your function to modify the `length` and `weight` columns of the `fish` dataset based on my cutoffs.**
 
 ```{r}
 #| label: modify-impossible-values-of-length-weight
+
+BlackfootFish <- BlackfootFish |>
+  mutate(length = unreasonable_values(length, 5, 80),
+         weight = unreasonable_values(weight, 10, 4000))
 
 ```
 
@@ -63,6 +86,11 @@ dataset and variable names as inputs)!
 ```{r}
 #| label: condition-function
 
+condition_index <- function(df, var_1, var_2){
+  df |>
+    mutate(c_index = ({{var_1}} / ({{var_2}} ** 3)) * 100)
+}
+
 ```
 
 **4. Make a thoughtful visualization of how fish conditions have varied over the duration of this study.**
@@ -75,5 +103,15 @@ dataset and variable names as inputs)!
 
 ```{r}
 #| label: condition-indices-over-time
+
+BlackfootFish |>
+  condition_index(weight, length) |>
+  ggplot(mapping = aes(x = year, y = c_index, colour = section)) +
+  geom_point(na.rm = TRUE) +
+  scale_color_manual(values = c("black", "deepskyblue2")) +
+  labs(x = "Time (Years)",
+       y = "",
+       subtitle = "Condition Index",
+       title = "The Condition Index of Weight and Length over Time")
 
 ```
