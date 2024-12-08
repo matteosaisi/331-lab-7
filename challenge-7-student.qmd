@@ -106,12 +106,15 @@ condition_index <- function(df, var_1, var_2){
 
 BlackfootFish |>
   condition_index(weight, length) |>
-  ggplot(mapping = aes(x = year, y = c_index, colour = section)) +
-  geom_point(na.rm = TRUE) +
-  scale_color_manual(values = c("black", "deepskyblue2")) +
+  ggplot(mapping = aes(x = year, y = c_index, color = section)) +
+  geom_smooth(na.rm = TRUE) +
+  facet_wrap(facets = "species") +
+  scale_color_manual(values = c("black", "deepskyblue2"),
+                     aesthetics = "color") +
   labs(x = "Time (Years)",
        y = "",
        subtitle = "Condition Index",
-       title = "The Condition Index of Weight and Length over Time")
+       title = "The Condition Index of Weight and Length over Time",
+       color = "Section")
 
 ```

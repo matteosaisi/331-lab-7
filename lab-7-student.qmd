@@ -69,13 +69,18 @@ BlackfootFish |>
                 ~ is.na(.x))) |>
   mutate(trip = as.factor(trip)) |>
   ggplot(mapping = aes(x = year, 
-                       y = section, 
-                       fill = trip)) +
-  geom_boxplot(orientation = "y") +
-  labs(x = "Year",
+                       fill = section)) +
+  geom_bar() +
+  facet_wrap(facets = "trip",
+             labeller = as_labeller(c("1" = "Trip 1", 
+                                      "2" = "Trip 2"))) +
+  scale_color_manual(values = c("deepskyblue3", "darkorchid"), 
+                     aesthetics = c("fill")) +
+  labs(x = "Years",
        y = "",
-       subtitle = "Section",
-       title = "Distribution of Missing Values Over the Years")
+       subtitle = "Number of Missing Values",
+       title = "Missing Values Over the Years Faceted By Trip and Filled by Section",
+       fill = "Section")
 
 ```
 
@@ -122,8 +127,10 @@ function, instead!
 #| label: write-rescale-function
 
 rescale_01 <- function(input){
-  if (!is.numeric(input)) stop("Must be Numeric")
-  if (length(input) <= 1) stop("Must have a length of at least 2")
+  if (!is.numeric(input)) 
+    stop("Must be Numeric")
+  if (length(input) <= 1) 
+    stop("Must have a length of at least 2")
   rng <- range(input, na.rm = TRUE)
   (input - rng[1]) / (rng[2] - rng[1])
 }
@@ -250,8 +257,10 @@ I expect that you carry out this process by calling the `rescale_column()` funct
 ```{r}
 #| label: rescale-two-columns
 
-BlackfootFish |>
+BlackfootFish <- BlackfootFish |>
   rescale_column(c(length, 
                    weight))
+
+head(BlackfootFish)
 
 ```
